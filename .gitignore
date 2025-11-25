@@ -1,0 +1,12 @@
+# .gitignore
+__pycache__/
+*.log
+*.json
+*.csv
+.venv/
+.env
+.DS_Store
+failed_*.txt
+passed_*.txt
+
+earthengineapikey.json
