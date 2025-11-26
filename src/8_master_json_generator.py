@@ -5,7 +5,7 @@ import os
 from google.cloud import storage
 
 # --- CONFIGURATION ---
-GCS_BUCKET_NAME = "drycap-tiles-colombia"
+GCS_BUCKET_NAME = "comparable-tiles-colombia-us"  # Google Cloud Storage in US region
 FAILED_LIST_FILE = "failed_for_next_stage_q30.txt"
 OUTPUT_JSON_FILE = "master_composites_index_v3.json"
 

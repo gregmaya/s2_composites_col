@@ -9,4 +9,6 @@ __pycache__/
 failed_*.txt
 passed_*.txt
 
+depricated/
+
 earthengineapikey.json
