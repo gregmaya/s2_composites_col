@@ -8,7 +8,7 @@ from runners import roads_frontier
 # CONFIG
 MASTER_JSON = "data/master_composites_index_v3.json"
 OUTPUT_FILE = "data/results/roads_results.csv"  # We will APPEND to this
-MISSING_IDS = ["99773", "50568", "18753"]
+MISSING_IDS = ["99773"]  # , "50568", "18753"]
 
 logging.basicConfig(level=logging.INFO)
 

@@ -7,9 +7,10 @@ import pandas as pd
 DATA_DIR = "data/results"
 OUTPUT_DIR = "data/analysis"
 os.makedirs(OUTPUT_DIR, exist_ok=True)
-OUTPUT_FILE = os.path.join(OUTPUT_DIR, "master_analysis_data.csv")
+OUTPUT_FILE = os.path.join(OUTPUT_DIR, "master_analysis_data_v2.csv")
 
 # Files
+FILE_WHOLE = os.path.join(DATA_DIR, "whole_results.csv")
 FILE_URBAN = os.path.join(DATA_DIR, "urban_results.csv")
 FILE_ROADS = os.path.join(DATA_DIR, "roads_results.csv")
 FILE_RURAL = os.path.join(DATA_DIR, "rural_noroads_results.csv")
@@ -83,6 +84,11 @@ def load_and_prep():
         df_rural["area_km2"] = df_rural["area_km2"]
     else:
         df_rural["area_km2"] = np.nan
+    # 4. Load Whole
+    # df_whole = pd.read_csv(FILE_WHOLE)
+    # df_whole["category"] = "Whole Municipio"
+    # df_whole["subtype"] = "Whole"
+    # df_whole["location"] = "Mixed"
 
     # 4. MERGE ALL
     # Normalize all to lowercase first
@@ -105,7 +111,7 @@ def load_and_prep():
     index_cols = [
         c
         for c in df_roads.columns
-        if any(x in c for x in ["ndbi", "ndvi", "savi", "bsi", "ndmi", "ndwi"])
+        if any(x in c for x in ["ndbi", "ndvi", "savi", "bsi", "ndmi", "ndwi", "ri"])
     ]
 
     cols_to_keep = common_cols + index_cols

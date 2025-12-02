@@ -12,7 +12,7 @@ import pandas as pd
 import seaborn as sns
 
 # --- CONFIG ---
-INPUT_FILE = "../../data/analysis/master_analysis_data.csv"
+INPUT_FILE = "../../data/analysis/master_analysis_data_v2.csv"
 PLOT_DIR = "src/spectral_analysis/plots"
 os.makedirs(PLOT_DIR, exist_ok=True)
 
@@ -134,7 +134,7 @@ print(summary)
 
 # %%
 def plot_rural_vs_urban_roads(df):
-    index_delta_col = "delta_savi_mean"
+    index_delta_col = "delta_ri_mean"
     print("Generating: Rural vs Urban Roads Comparison...")
 
     df_roads = df[df["category"] == "Roads"].copy()
@@ -229,6 +229,7 @@ plot_weighted_impact(df)
 
 
 def plot_detailed_validation(df):
+    indexcol = "delta_ndbi_mean"
     print("Generating: Detailed Validation by Subtype...")
 
     # Filter for Rural only
@@ -255,7 +256,7 @@ def plot_detailed_validation(df):
     sns.boxplot(
         data=df_rural,
         x="Comparison_Class",
-        y="delta_ndbi_mean",
+        y=indexcol,
         order=order,
         palette={
             "trunk": "#e74c3c",
@@ -270,12 +271,14 @@ def plot_detailed_validation(df):
     plt.title(
         "Detailed Validation: Rural Road Subtypes vs. Background Stability", fontsize=16
     )
-    plt.ylabel("Delta NDBI (2019-2023)", fontsize=12)
+    plt.ylabel(
+        f"{str.capitalize(str.replace(indexcol, '_', ' '))} (2019-2023)", fontsize=12
+    )
     plt.xlabel("Rural Class", fontsize=12)
     plt.axhline(0, color="black", linewidth=0.8, linestyle="--")
 
     plt.tight_layout()
-    plt.savefig(f"{PLOT_DIR}/5_detailed_validation.png", dpi=300)
+    # plt.savefig(f"{PLOT_DIR}/5_detailed_validation.png", dpi=300)
     plt.show()
 
 
@@ -300,8 +303,8 @@ def plot_paving_scatter(df):
 
     sns.scatterplot(
         data=df_roads_rural,
-        x="ndbi_2019_mean",
-        y="delta_ndbi_mean",
+        x="ri_2019_mean",
+        y="delta_ri_mean",
         hue="subtype",
         alpha=0.6,
         style="subtype",
@@ -310,8 +313,8 @@ def plot_paving_scatter(df):
     plt.title(
         "The Paving Signature: Initial State vs Change (Rural Roads)", fontsize=16
     )
-    plt.xlabel("Initial NDBI (2019) [Lower = Green/Dirt]", fontsize=12)
-    plt.ylabel("Change in NDBI [Higher = Paving]", fontsize=12)
+    plt.xlabel("Initial RI (2019) [Lower = Green/Dirt]", fontsize=12)
+    plt.ylabel("Change in RI [Higher = Paving]", fontsize=12)
     plt.axhline(0, color="black", linewidth=0.5)
     plt.axvline(0, color="black", linewidth=0.5)
 
@@ -325,6 +328,8 @@ plot_paving_scatter(df)
 
 # %%
 def plot_kde_facets(df):
+    indexcol_y = "delta_ri_mean"
+    indexcol_x = "ri_2019_mean"
     print("Generating: Faceted KDE Paving Signature...")
 
     # Filter: Rural Roads only
@@ -352,8 +357,8 @@ def plot_kde_facets(df):
     # Draw Density Contours (filled)
     g.map_dataframe(
         sns.kdeplot,
-        x="ndbi_2019_mean",
-        y="delta_ndbi_mean",
+        x=indexcol_x,
+        y=indexcol_y,
         fill=True,
         alpha=0.6,
         levels=10,
@@ -448,14 +453,14 @@ def plot_correlation_profile(df):
         data = df_rural[df_rural["subtype"] == subtype]
 
         corr_ndvi = data["delta_ndbi_mean"].corr(data["delta_ndvi_mean"])
-        corr_bsi = data["delta_ndbi_mean"].corr(data["delta_bsi_mean"])
+        corr_ri = data["delta_ndbi_mean"].corr(data["delta_ri_mean"])
         corr_savi = data["delta_ndbi_mean"].corr(data["delta_savi_mean"])
 
         results.append(
             {"Subtype": subtype, "Pair": "NDBI vs NDVI", "Correlation": corr_ndvi}
         )
         results.append(
-            {"Subtype": subtype, "Pair": "NDBI vs BSI", "Correlation": corr_bsi}
+            {"Subtype": subtype, "Pair": "NDBI vs RI", "Correlation": corr_ri}
         )
         results.append(
             {"Subtype": subtype, "Pair": "NDBI vs SAVI", "Correlation": corr_savi}
@@ -479,7 +484,8 @@ def plot_correlation_profile(df):
     )
 
     plt.title(
-        "Spectral Consistency Check: Correlations across Road Classes", fontsize=16
+        "Spectral Consistency Check: Correlations across Road Classes in Rural Context",
+        fontsize=16,
     )
     plt.ylabel("Pearson Correlation Coefficient", fontsize=12)
     plt.xlabel("Index Relationship", fontsize=12)
@@ -498,7 +504,7 @@ plot_correlation_profile(df)
 def plot_savi_ndbi_scatter(df):
     area = "Urban"
 
-    print("Generating: NDBI vs SAVI Mechanism Check...")
+    print("Generating: RI vs SAVI Mechanism Check...")
 
     # Filter: Urban Roads only
     df_temp = df[(df["category"] == "Roads") & (df["location"] == area)].copy()
@@ -523,12 +529,12 @@ def plot_savi_ndbi_scatter(df):
     )
 
     # Draw Scatter points
-    g.map(sns.scatterplot, "delta_ndbi_mean", "delta_savi_mean", alpha=0.6, s=30)
+    g.map(sns.scatterplot, "delta_ri_mean", "delta_savi_mean", alpha=0.6, s=30)
 
     # Draw Regression Line (to show the trend clearly)
     g.map(
         sns.regplot,
-        "delta_ndbi_mean",
+        "delta_ri_mean",
         "delta_savi_mean",
         scatter=False,
         ci=None,
@@ -544,7 +550,7 @@ def plot_savi_ndbi_scatter(df):
 
     # Titles and Labels
     g.set_titles("{col_name} Roads")
-    g.set_axis_labels("Change in NDBI (Hardening)", "Change in SAVI (Vegetation)")
+    g.set_axis_labels("Change in RI", "Change in SAVI (Vegetation)")
 
     # Adjust Layout
     plt.subplots_adjust(top=0.9)
@@ -552,7 +558,7 @@ def plot_savi_ndbi_scatter(df):
         f"Mechanism Check: Hardening vs. Vegetation Loss ({area})", fontsize=16
     )
 
-    plt.savefig(f"{PLOT_DIR}/11_savi_ndbi_scatter.png", dpi=300)
+    # plt.savefig(f"{PLOT_DIR}/11_savi_ndbi_scatter.png", dpi=300)
     plt.show()
 
 

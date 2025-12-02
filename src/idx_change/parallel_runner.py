@@ -103,4 +103,4 @@ def run_parallel(module_name, workers=NUM_WORKERS):
 
 if __name__ == "__main__":
     # Run Urban in Parallel
-    run_parallel("rural")
+    run_parallel("whole", workers=NUM_WORKERS)
